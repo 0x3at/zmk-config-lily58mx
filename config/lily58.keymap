@@ -20,7 +20,7 @@
  *  36  37  38  39  40  41  42      43  44  45  46  47  48  49
  *              50  51  52  53      54  55  56  57
  *
- * Layers: 0 = Base, 1 = Raise, 2 = Lower.
+ * Layers: 0 = Base, 1 = Symbol, 2 = Raise, 3 = Lower.
  */
 
 / {
@@ -51,13 +51,24 @@
             hold-trigger-on-release;
         };
 
-        /* Tap: second param (SPACE). Hold: jump to layer in first param (0 = Base). Usage: &spaceOr0 0 SPACE */
+        /* Tap: send the key in the second param. Hold: switch to the layer in the first param (&to).
+         * Usage: &layerORkp 0 SPACE  (tap = Space, hold = back to Base). */
         layerORkp: layerORkp {
             compatible = "zmk,behavior-hold-tap";
             #binding-cells = <2>;
             flavor = "tap-preferred";
             tapping-term-ms = <280>;
             bindings = <&to>, <&kp>;
+        };
+
+        /* Tap: sticky layer (next key only) from the second param. Hold: the modifier in the first param.
+         * Usage: &shiftOrSym LSHFT 1  (tap = one key from Symbol, hold = Shift). */
+        shiftOrSym: shiftOrSym {
+            compatible = "zmk,behavior-hold-tap";
+            #binding-cells = <2>;
+            flavor = "hold-preferred";
+            tapping-term-ms = <200>;
+            bindings = <&kp>, <&sl>;
         };
     };
 
@@ -66,50 +77,69 @@
 
         default_layer {
             display-name = "Base";
-// ------------------------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------------------------------------------------------------------
 // |    -     |    1     |    2     |    3     |    4     |    5     |                     |    6     |    7     |    8     |    9     |    0     |    =     |
-// | TAB/L1   |    Q     |    W     |    E     |    R     |    T     |                     |    Y     |    U     |    I     |    O     |    P     |  `/L1    |
-// |   CAPS   |  CTRL/A  |  ALT/S   | SHIFT/D  |  GUI/F   |    G     |                     |    H     |  GUI/J   | SHIFT/K  |  ALT/L   |  CTRL/;  |    |     |
-// |  LSHIFT  |    Z     |    X     |    C     |    V     |    B     |    [     |    ]     |    N     |    M     |    ,     |    .     |    "     |    ?     |
-//                                  |  LA(A)   | TOG L1   |   BSPC   | SPC/to0  |   RET    |   BSPC   | TOG L2   |   CAPS   |
+// | TAB/RAI  |    Q     |    W     |    E     |    R     |    T     |                     |    Y     |    U     |    I     |    O     |    P     |  `/RAI   |
+// |   CAPS   |  CTRL/A  |  ALT/S   |  SHFT/D  |  GUI/F   |    G     |                     |    H     |  GUI/J   |  SHFT/K  |  ALT/L   |  CTRL/;  |    |     |
+// | SHFT/SYM |    Z     |    X     |    C     |    V     |    B     |    [     |    ]     |    N     |    M     |    ,     |    .     |    "     |    ?     |
+//                                  |  LA(A)   | TOG RAI  |   BSPC   | SPC/BASE | RET/BASE |   BSPC   | TOG LOW  |CAPS WORD |
             bindings = <
-&kp MINUS          &kp N1             &kp N2             &kp N3             &kp N4             &kp N5                                                    &kp N6             &kp N7             &kp N8             &kp N9             &kp N0             &kp EQUAL
-&lt 1 TAB          &kp Q              &kp W              &kp E              &kp R              &kp T                                                     &kp Y              &kp U              &kp I              &kp O              &kp P              &lt 1 GRAVE
-&kp CAPS           &hml LCTRL A       &hml LALT S        &hml LSHFT D       &hml LGUI F        &kp G                                                     &kp H              &hmr RGUI J        &hmr RSHFT K       &hmr RALT L        &hmr RCTRL SEMI    &kp PIPE
-&kp LSHFT          &kp Z              &kp X              &kp C              &kp V              &kp B              &kp LBKT            &kp RBKT           &kp N              &kp M              &kp COMMA          &kp DOT            &kp DQT            &kp QMARK
-                                                         &kp LA(A)          &tog 1             &kp BSPC           &layerORkp 0 SPACE  &layerORkp 0 RET   &kp BSPC           &tog 2             &kp CAPS
+&kp MINUS            &kp N1               &kp N2               &kp N3               &kp N4               &kp N5                                                         &kp N6               &kp N7               &kp N8               &kp N9               &kp N0               &kp EQUAL
+&lt 2 TAB            &kp Q                &kp W                &kp E                &kp R                &kp T                                                          &kp Y                &kp U                &kp I                &kp O                &kp P                &lt 2 GRAVE
+&kp CAPS             &hml LCTRL A         &hml LALT S          &hml LSHFT D         &hml LGUI F          &kp G                                                          &kp H                &hmr RGUI J          &hmr RSHFT K         &hmr RALT L          &hmr RCTRL SEMI      &kp PIPE
+&shiftOrSym LSHFT 1  &kp Z                &kp X                &kp C                &kp V                &kp B                &kp LBKT             &kp RBKT             &kp N                &kp M                &kp COMMA            &kp DOT              &kp DQT              &kp QMARK
+                                                               &kp LA(A)            &tog 2               &kp BSPC             &layerORkp 0 SPACE   &layerORkp 0 RET     &kp BSPC             &tog 3               &caps_word
             >;
         };
+
+        symbol_layer {
+            display-name = "Symbol";
+// ------------------------------------------------------------------------------------------------------------------------------------------------------------
+// |          |          |          |          |          |          |                     |          |          |          |          |          |          |
+// |          |    =     |    $     |    `     |    "     |          |                     |          |          |          |          |          |          |
+// |          |    [     |    ]     |    {     |    }     |          |                     |          |    '     |    /     |    \     |          |          |
+// |          |    <     |    >     |    (     |    )     |          |          |          |          |          |          |          |          |          |
+//                                  |          |          |          |          |          |          |          |          |
+            bindings = <
+&trans               &trans               &trans               &trans               &trans               &trans                                                         &trans               &trans               &trans               &trans               &trans               &trans
+&trans               &kp EQUAL            &kp DLLR             &kp GRAVE            &kp DQT              &trans                                                         &trans               &trans               &trans               &trans               &trans               &trans
+&trans               &kp LBKT             &kp RBKT             &kp LBRC             &kp RBRC             &trans                                                         &trans               &kp SQT              &kp FSLH             &kp BSLH             &trans               &trans
+&trans               &kp LT               &kp GT               &kp LPAR             &kp RPAR             &trans               &trans               &trans               &trans               &trans               &trans               &trans               &trans               &trans
+                                                               &trans               &trans               &trans               &trans               &trans               &trans               &trans               &trans
+            >;
+        };
+
         raise_layer {
             display-name = "Raise";
-// ------------------------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------------------------------------------------------------------
 // |  BT PRV  |  BT NXT  |          |          |          |  unlock  |                     |  unlock  |          |          |          |          | OUT TOG  |
 // |          |          |          |          |          |          |                     |          |          |          |          |          |          |
 // |          |          |          |          |          |          |                     |   LEFT   |    UP    |   DOWN   |  RIGHT   |          |          |
 // |          |          |          |          |          |          |    (     |    )     |          |          |          |          |          |          |
-//                                  | SCRL DN  |          |          |  LCLK    |  RCLK    |          |          | SCRL UP  |
+//                                  | SCRL DN  |          |          |   LCLK   |   RCLK   |          |          | SCRL UP  |
             bindings = <
-&bt BT_PRV         &bt BT_NXT         &trans             &trans             &trans             &studio_unlock                                           &studio_unlock     &trans             &trans             &trans             &trans             &out OUT_TOG
-&trans             &trans             &trans             &trans             &trans             &trans                                                   &trans             &trans             &trans             &trans             &trans             &trans
-&trans             &trans             &trans             &trans             &trans             &trans                                                   &kp LEFT           &kp UP             &kp DOWN           &kp RIGHT          &trans             &trans
-&trans             &trans             &trans             &trans             &trans             &trans             &kp LPAR           &kp RPAR           &trans             &trans             &trans             &trans             &trans             &trans
-                                                         &msc SCRL_DOWN     &trans             &trans             &mkp LCLK          &mkp RCLK          &trans             &trans             &msc SCRL_UP
+&bt BT_PRV           &bt BT_NXT           &trans               &trans               &trans               &studio_unlock                                                 &studio_unlock       &trans               &trans               &trans               &trans               &out OUT_TOG
+&trans               &trans               &trans               &trans               &trans               &trans                                                         &trans               &trans               &trans               &trans               &trans               &trans
+&trans               &trans               &trans               &trans               &trans               &trans                                                         &kp LEFT             &kp UP               &kp DOWN             &kp RIGHT            &trans               &trans
+&trans               &trans               &trans               &trans               &trans               &trans               &kp LPAR             &kp RPAR             &trans               &trans               &trans               &trans               &trans               &trans
+                                                               &msc SCRL_DOWN       &trans               &trans               &mkp LCLK            &mkp RCLK            &trans               &trans               &msc SCRL_UP
             >;
         };
+
         lower_layer {
             display-name = "Lower";
-// ------------------------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------------------------------------------------------------------
 // |          |          |          |          |          |  unlock  |                     |  unlock  |          |          |          |          |          |
 // |          |          |          |          |          |          |                     |          |          |          |          |          |          |
 // |          |          |          |          |          |          |                     |   LEFT   |    UP    |   DOWN   |  RIGHT   |          |          |
 // |          |          |          |          |          |          |    <     |    >     |          |          |          |          |          |          |
-//                                  |   MB4    |          |          |  LCLK    |  RCLK    |          |          |   MB5    |
+//                                  |   MB4    |          |          |   LCLK   |   RCLK   |          |          |   MB5    |
             bindings = <
-&trans             &trans             &trans             &trans             &trans             &studio_unlock                                           &studio_unlock     &trans             &trans             &trans             &trans             &trans
-&trans             &trans             &trans             &trans             &trans             &trans                                                   &trans             &trans             &trans             &trans             &trans             &trans
-&trans             &trans             &trans             &trans             &trans             &trans                                                   &kp LEFT           &kp UP             &kp DOWN           &kp RIGHT          &trans             &trans
-&trans             &trans             &trans             &trans             &trans             &trans             &kp LT             &kp GT             &trans             &trans             &trans             &trans             &trans             &trans
-                                                         &mkp MB4           &trans             &trans             &mkp LCLK          &mkp RCLK          &trans             &trans             &mkp MB5
+&trans               &trans               &trans               &trans               &trans               &studio_unlock                                                 &studio_unlock       &trans               &trans               &trans               &trans               &trans
+&trans               &trans               &trans               &trans               &trans               &trans                                                         &trans               &trans               &trans               &trans               &trans               &trans
+&trans               &trans               &trans               &trans               &trans               &trans                                                         &kp LEFT             &kp UP               &kp DOWN             &kp RIGHT            &trans               &trans
+&trans               &trans               &trans               &trans               &trans               &trans               &kp LT               &kp GT               &trans               &trans               &trans               &trans               &trans               &trans
+                                                               &mkp MB4             &trans               &trans               &mkp LCLK            &mkp RCLK            &trans               &trans               &mkp MB5
             >;
         };
     };
