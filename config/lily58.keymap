@@ -66,8 +66,6 @@ ZMK_HOLD_TAP(hmr,
 &mt LSHFT BSPC  &kp Z        &kp X       &kp C        &kp V       &kp B     &kp LBKT     &kp RBKT     &kp N      &kp M       &kp COMMA      &kp DOT     &kp FSLH         &mt RSHFT BSPC
                                          &kp BSPC     &kp LA(A)   &mo RAISE &kp SPACE    &kp RET      &mo LOWER  &kp BSLH    &kp BSPC
             >;
-
-            sensor-bindings = <&inc_dec_kp C_VOL_UP C_VOL_DN>;
         };
 
         raise_layer {
@@ -85,8 +83,6 @@ ZMK_HOLD_TAP(hmr,
 &trans       &trans       &trans       &trans       &trans       &trans   &trans   &msc SCRL_UP          &trans         &trans   &trans  &trans   &trans    &trans
                                        &trans       &trans       &trans   &trans   &msc SCRL_DOWN        &trans         &trans   &trans
             >;
-
-            sensor-bindings = <&inc_dec_kp C_VOL_UP C_VOL_DN>;
         };
 
         lower_layer {
@@ -104,8 +100,6 @@ ZMK_HOLD_TAP(hmr,
 &trans       &trans       &trans       &trans       &trans          &trans          &msc SCRL_LEFT  &trans  &trans      &trans   &trans  &trans   &trans    &trans
                                        &trans       &trans          &trans          &msc SCRL_RIGHT &trans  &trans      &trans   &trans
             >;
-
-            sensor-bindings = <&inc_dec_kp C_VOL_UP C_VOL_DN>;
         };
     };
 };
